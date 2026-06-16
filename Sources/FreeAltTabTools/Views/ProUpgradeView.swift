@@ -18,20 +18,53 @@ public struct ProUpgradeView: View {
     
     
     public var body: some View {
-        Form {
-            if #available(macOS 14, *) {
-                proModeToggle
-                    .controlSize(.extraLarge)
-            }
-            else if #available(macOS 11, *) {
-                proModeToggle
-                    .controlSize(.large)
+        VStack {
+            if #available(macOS 13, *) {
+                form
+                    .formStyle(.grouped)
+                    .scrollDisabled(true)
             }
             else {
-                proModeToggle
+                form
             }
             
-            Text("You get to decide whether you want to use Pro mode or not. No restrictions!")
+            Spacer()
+            
+            if #available(macOS 11, *) {
+                HStack {
+                    Spacer()
+                    Image("Nyk", bundle: .module)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 250)
+                        .help("There is no reason for this photo of my cat. I just thought it was cute and wanted to share it!")
+                }
+            }
+        }
+    }
+    
+    
+    var form: some View {
+        Form {
+            Section {
+                if #available(macOS 14, *) {
+                    proModeToggle
+                        .controlSize(.extraLarge)
+                }
+                else if #available(macOS 11, *) {
+                    proModeToggle
+                        .controlSize(.large)
+                }
+                else {
+                    proModeToggle
+                }
+            } footer: {
+                Text("""
+                    You get to decide whether you want to use Pro mode or not. No restrictions!
+                    Turning off Pro Mode might change some of your settings.
+                    """)
+                    .font(.caption)
+            }
         }
     }
     
@@ -46,6 +79,7 @@ public struct ProUpgradeView: View {
             licenseState = proMode ? .pro : .free
         })
         .toggleStyle(.switch)
+        .font(.largeTitle)
     }
 }
 
@@ -55,9 +89,8 @@ public struct ProUpgradeView: View {
 public extension ProUpgradeView {
     static func nsView(licenseState: Binding<UserChosenLicenseState>) -> NSView {
         let view = NSHostingView(rootView: ProUpgradeView(licenseState: licenseState))
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        view.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        view.translatesAutoresizingMaskIntoConstraints = true
+        view.autoresizingMask = [.width, .height]
         return view
     }
 }
