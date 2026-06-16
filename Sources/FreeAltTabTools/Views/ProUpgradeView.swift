@@ -12,8 +12,22 @@ import SwiftUI
 /// The view to show in place of the upgrade/account view
 @available(macOS 10.15, *)
 public struct ProUpgradeView: View {
+    
+    @Binding
+    var licenseState: UserChosenLicenseState
+    
+    
     public var body: some View {
-        Text("Hello, Pro!")
+        Toggle("Pro mode", isOn: Binding{
+            switch licenseState {
+            case .pro: true
+            case .free: false
+            }
+        } set: { proMode in
+            licenseState = proMode ? .pro : .free
+        })
+        .toggleStyle(.switch)
+        // …rest of your fancy view
     }
 }
 
@@ -21,8 +35,8 @@ public struct ProUpgradeView: View {
 
 @available(macOS 10.15, *)
 public extension ProUpgradeView {
-    static func nsView() -> NSView {
-        let view = NSHostingView(rootView: ProUpgradeView())
+    static func nsView(licenseState: Binding<UserChosenLicenseState>) -> NSView {
+        let view = NSHostingView(rootView: ProUpgradeView(licenseState: licenseState))
         view.translatesAutoresizingMaskIntoConstraints = false
         view.widthAnchor.constraint(equalToConstant: 100).isActive = true
         view.heightAnchor.constraint(equalToConstant: 100).isActive = true
@@ -34,5 +48,5 @@ public extension ProUpgradeView {
 
 @available(macOS 10.15, *)
 #Preview {
-    ProUpgradeView()
+    ProUpgradeView(licenseState: .constant(.pro))
 }
